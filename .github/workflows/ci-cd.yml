@@ -32,7 +32,7 @@ jobs:
         run: npm install
       - name: Run frontend tests
         working-directory: server/frontend
-        run: npm test -- --watchAll=false
+        run: npm test
         env:
           CI: true
       - name: Build React frontend
@@ -43,17 +43,30 @@ jobs:
     name: Build and Verify Docker Stack
     runs-on: ubuntu-latest
     needs: validate
+    env:
+      JWT_SECRET: ci-cd-test-secret-key-at-least-32-chars-long
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Build API image
         run: docker build -t mindflow-api ./server
       - name: Build web image
         run: docker build -t mindflow-web --build-arg REACT_APP_API_URL="" ./server/frontend
-      - name: Verify Docker Compose startup
-        env:
-          JWT_SECRET: ci-cd-test-secret-key-at-least-32-chars-long
+      - name: Start Docker Compose stack
+        run: docker compose up -d --build --wait --wait-timeout 180
+      - name: Verify the web app is served
+        run: curl --fail --silent --show-error http://localhost:8081/ > /dev/null
+      - name: Verify /auth is proxied to the API
         run: |
-          docker compose up -d --build
-          sleep 10
-          docker compose ps
-          docker compose down
+          status=$(curl --silent --output /dev/null --write-out "%{http_code}" \
+            -X POST http://localhost:8081/auth/login \
+            -H "Content-Type: application/json" \
+            -d '{"username":"ci-user","password":"wrong-password"}')
+          echo "POST /auth/login returned HTTP $status"
+          test "$status" = "401"
+      - name: Show container logs on failure
+        if: failure()
+        run: docker compose logs --no-color
+      - name: Stop the stack
+        if: always()
+        run: docker compose down -v

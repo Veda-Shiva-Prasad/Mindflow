@@ -1,7 +1,11 @@
 require("dotenv").config();
 
 const dns = require("node:dns");
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
+
+// Only needed for mongodb+srv:// (Atlas) lookups on networks with flaky DNS.
+if ((process.env.MONGO_URI || "").startsWith("mongodb+srv://")) {
+  dns.setServers(["8.8.8.8", "1.1.1.1"]);
+}
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -11,12 +15,19 @@ const rateLimit = require("express-rate-limit");
 
 const app = express();
 
+// Running behind nginx / a hosting proxy: trust one proxy hop so the rate
+// limiter sees real client IPs instead of the proxy's IP.
+app.set("trust proxy", 1);
+
+const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:3000")
+  .split(",")
+  .map((origin) => origin.trim().replace(/\/+$/, ""))
+  .filter(Boolean);
+
 app.use(helmet());
 app.use(
   cors({
-    origin: (process.env.CLIENT_URL || "http://localhost:3000")
-      .split(",")
-      .map((origin) => origin.trim()),
+    origin: allowedOrigins,
     credentials: true,
   }),
 );
