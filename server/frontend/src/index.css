@@ -1,13 +1,4 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
-}
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box}html,body,#root{min-height:100%;margin:0}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}button,input,textarea,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--focus);outline-offset:2px}::selection{background:#d8c9f7;color:#30254b}
+:root{--bg:#f7f6f2;--surface:#fff;--surface-2:#f7f5f0;--text:#292a28;--muted:#85857f;--line:#eae8e1;--accent:#7664a8;--accent-dark:#5f4e90;--accent-soft:#f0ecf8;--shadow:0 14px 40px rgba(50,45,35,.045);--focus:#b7a5e4}
+:root[data-theme="dark"]{--bg:#17191b;--surface:#222528;--surface-2:#292d30;--text:#f0f0ec;--muted:#a4a7a4;--line:#373c3e;--accent:#b6a4e6;--accent-dark:#c9baf0;--accent-soft:#373044;--shadow:0 14px 40px rgba(0,0,0,.18);--focus:#9e89d1}
